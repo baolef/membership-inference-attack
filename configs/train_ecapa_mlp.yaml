@@ -1,5 +1,6 @@
 dataset:
-  root: path_to_data
+  root: <path_to_CSV_file>
+  
   batch_size: 16
 
 model:
