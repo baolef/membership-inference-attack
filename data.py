@@ -20,10 +20,11 @@ import speechbrain as sb
 #         return self.audio, self.label
 
 def create_data(root, data_root):
-    sb.dataio.dataset.DynamicItemDataset.from_csv(
+    data = sb.dataio.dataset.DynamicItemDataset.from_csv(
         csv_path=root,
         replacements={"data_root": data_root},
     )
+    return data
 
 def create_dataloader(root, data_root, batch_size):
     train_data = create_data(root, data_root)
