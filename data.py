@@ -4,72 +4,75 @@ import torch
 import os
 import torchaudio
 import csv
-import speechbrain as sb
+from speechbrain.dataio.batch import PaddedBatch
+
+class AudioDataset(torch.utils.data.Dataset):
+    def __init__(root, data_root):
+
+        self.audioPath = []
+        self.labels = []
+
+        with open(root) as csv_file:
+            csv_reader = csv.DictReader(csv_file)
+
+            for row in csv_reader:
+                del row['']
+                self.audioPath.append(data_root + row['wav'])
+
+                if row['present_label'] == "TRUE":
+                    self.labels.append(1.0)
+                else:
+                    self.labels.append(0.0)
 
 
-# class AudioDataset(torch.utils.data.Dataset):
-#     def __init__(self):
-#         audio, _ = torchaudio.load('speechbrain/tests/samples/single-mic/example1.wav')
-#         self.audio = audio.flatten()
-#         self.label = torch.tensor([1.0])
+        self.length = len(self.audioPath)
+        
 
-#     def __len__(self):
-#         return 100
+    def __len__(self):
+        return self.length
 
-#     def __getitem__(self, ind):
-#         return self.audio, self.label
+    def __getitem__(self, ind):
+        audio, _ = torchaudio.load(self.audioPath[ind])
+        audio = audio.flatten()
 
-def create_data(root, data_root):
-    data = sb.dataio.dataset.DynamicItemDataset.from_csv(
-        csv_path=root,
-        replacements={"data_root": data_root},
-    )
-    return data
+        label = torch.tensor(self.labels[ind])
+
+        return audio, label
+
 
 def create_dataloader(root, data_root, batch_size):
-    train_data = create_data(root, data_root)
-    val_data = create_data(root, data_root)
-    test_data = create_data(root, data_root)
+
+    train_data = AudioDataset(root+'/train.csv', data_root)
+    val_data = AudioDataset(root+'/val.csv', data_root)
+    test_data = AudioDataset(root+'/test.csv', data_root)
 
     n_cpu = os.cpu_count()
 
-    # train_loader = torch.utils.data.DataLoader(
-    #     dataset=train_data,
-    #     num_workers=n_cpu,
-    #     batch_size=batch_size,
-    #     pin_memory=True,
-    #     shuffle=True
-    # )
+    train_loader = torch.utils.data.DataLoader(
+        dataset=train_data,
+        num_workers=n_cpu,
+        batch_size=batch_size,
+        pin_memory=True,
+        shuffle=True,
+        collate_fn = PaddedBatch
+    )
 
-    # valid_loader = torch.utils.data.DataLoader(
-    #     dataset=val_data,
-    #     num_workers=n_cpu // 2,
-    #     batch_size=batch_size,
-    #     pin_memory=True,
-    #     shuffle=False
-    # )
+    valid_loader = torch.utils.data.DataLoader(
+        dataset=val_data,
+        num_workers=n_cpu // 2,
+        batch_size=batch_size,
+        pin_memory=True,
+        shuffle=False,
+        collate_fn = PaddedBatch
+    )
 
-    # test_loader = torch.utils.data.DataLoader(
-    #     dataset=test_data,
-    #     num_workers=n_cpu // 2,
-    #     batch_size=batch_size,
-    #     pin_memory=True,
-    #     shuffle=False
-    # )
-
-    train_loader = sb.dataio.dataloader.make_dataloader(train_data, sb.Stage.TRAIN, {'num_workers': n_cpu,
-                                                                                     'batch_size': batch_size,
-                                                                                     'pin_memory': True,
-                                                                                     'shuffle': True})
-    
-    valid_loader = sb.dataio.dataloader.make_dataloader(val_data, sb.Stage.VALID, {'num_workers': n_cpu//2,
-                                                                   'batch_size': batch_size,
-                                                                   'pin_memory': True,
-                                                                   'shuffle': False})
-    
-    test_loader = sb.dataio.dataloader.make_dataloader(test_data, {'num_workers': n_cpu//2,
-                                                                   'batch_size': batch_size,
-                                                                   'pin_memory': True,
-                                                                   'shuffle': False})
+    test_loader = torch.utils.data.DataLoader(
+        dataset=test_data,
+        num_workers=n_cpu // 2,
+        batch_size=batch_size,
+        pin_memory=True,
+        shuffle=False,
+        collate_fn = PaddedBatch
+    )
 
     return train_loader, valid_loader, test_loader
