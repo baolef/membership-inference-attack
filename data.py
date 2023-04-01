@@ -22,10 +22,7 @@ class AudioDataset(torch.utils.data.Dataset):
                 audio, _ = torchaudio.load(path, num_frames=num_frames, frame_offset=start)
                 self.audios.append(audio.flatten())
 
-                if row['present_label'] == "True":
-                    self.labels.append([1.0])
-                else:
-                    self.labels.append([0.0])
+                self.labels.append([float(row['label'])])
                 self.ids.append(row['spk_id'])
 
         self.length = len(self.audios)
