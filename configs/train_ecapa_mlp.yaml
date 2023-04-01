@@ -1,7 +1,7 @@
 dataset:
-  root: <path_to_CSV_file>
-  data_root: <path_to_data_folder>
-  batch_size: 16
+  root: split
+  data_root: /home/baole/cmu/2023spring/11785/data/vox1/vox1_all
+  batch_size: 64
 
 model:
   name: mi
@@ -21,15 +21,14 @@ model:
 optimizer:
   name: AdamW
   args:
-    lr: 0.0001
+    lr: 0.001
 
 epoch_max: 20
 scheduler:
   name: CosineAnnealingLR
   args:
     T_max: 20
-    eta_min: 0.00001
+    eta_min: 0.0001
 
 epoch_save: 10
 precision: full
-resume: save/_train_ecapa_mlp/epoch-10.pth

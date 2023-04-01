@@ -4,47 +4,43 @@ import torch
 import os
 import torchaudio
 import csv
-from speechbrain.dataio.batch import PaddedBatch
 
 class AudioDataset(torch.utils.data.Dataset):
-    def __init__(root, data_root):
+    def __init__(self, root, data_root):
 
-        self.audioPath = []
+        self.audios = []
         self.labels = []
 
         with open(root) as csv_file:
             csv_reader = csv.DictReader(csv_file)
 
             for row in csv_reader:
-                del row['']
-                self.audioPath.append(data_root + row['wav'])
+                path=os.path.join(data_root, row['wav'])
+                num_frames=int(row['stop'])-int(row['start'])
+                start=int(row['start'])
+                audio, _ = torchaudio.load(path, num_frames=num_frames, frame_offset=start)
+                self.audios.append(audio.flatten())
 
-                if row['present_label'] == "TRUE":
-                    self.labels.append(1.0)
+                if row['present_label'] == "True":
+                    self.labels.append([1.0])
                 else:
-                    self.labels.append(0.0)
+                    self.labels.append([0.0])
 
-
-        self.length = len(self.audioPath)
-        
+        self.length = len(self.audios)
 
     def __len__(self):
         return self.length
 
     def __getitem__(self, ind):
-        audio, _ = torchaudio.load(self.audioPath[ind])
-        audio = audio.flatten()
-
+        audio = self.audios[ind]
         label = torch.tensor(self.labels[ind])
-
         return audio, label
 
 
 def create_dataloader(root, data_root, batch_size):
-
-    train_data = AudioDataset(root+'/train.csv', data_root)
-    val_data = AudioDataset(root+'/val.csv', data_root)
-    test_data = AudioDataset(root+'/test.csv', data_root)
+    train_data = AudioDataset(os.path.join(root,'train.csv'), data_root)
+    val_data = AudioDataset(os.path.join(root,'val.csv'), data_root)
+    test_data = AudioDataset(os.path.join(root,'test.csv'), data_root)
 
     n_cpu = os.cpu_count()
 
@@ -54,7 +50,6 @@ def create_dataloader(root, data_root, batch_size):
         batch_size=batch_size,
         pin_memory=True,
         shuffle=True,
-        collate_fn = PaddedBatch
     )
 
     valid_loader = torch.utils.data.DataLoader(
@@ -63,7 +58,6 @@ def create_dataloader(root, data_root, batch_size):
         batch_size=batch_size,
         pin_memory=True,
         shuffle=False,
-        collate_fn = PaddedBatch
     )
 
     test_loader = torch.utils.data.DataLoader(
@@ -72,7 +66,6 @@ def create_dataloader(root, data_root, batch_size):
         batch_size=batch_size,
         pin_memory=True,
         shuffle=False,
-        collate_fn = PaddedBatch
     )
 
     return train_loader, valid_loader, test_loader

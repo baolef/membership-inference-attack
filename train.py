@@ -108,7 +108,7 @@ def validate_model(model, val_loader, criterion, metrics):
         metrics.update(pred, y)
 
         batch_bar.set_postfix(loss="{:.04f}".format(float(total_loss / (i + 1))),
-                              dist="{:.04f}".format(float(metrics.compute())))
+                              acc="{:.04f}".format(float(metrics.compute())))
 
         batch_bar.update()
 
