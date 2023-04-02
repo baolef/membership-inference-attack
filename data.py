@@ -22,10 +22,7 @@ class AudioDataset(torch.utils.data.Dataset):
                 audio, _ = torchaudio.load(path, num_frames=num_frames, frame_offset=start)
                 self.audios.append(audio.flatten())
 
-                if row['present_label'] == "True":
-                    self.labels.append([1.0])
-                else:
-                    self.labels.append([0.0])
+                self.labels.append([float(row['label'])])
                 self.ids.append(row['spk_id'])
 
         self.length = len(self.audios)
@@ -41,9 +38,9 @@ class AudioDataset(torch.utils.data.Dataset):
 
 
 def create_dataloader(root, data_root, batch_size):
-    train_data = AudioDataset(os.path.join(root,'train.csv'), data_root)
-    val_data = AudioDataset(os.path.join(root,'val.csv'), data_root)
-    test_data = AudioDataset(os.path.join(root,'test.csv'), data_root)
+    train_data = AudioDataset(os.path.join(root, 'split/utterance/train.csv'), data_root)
+    val_data = AudioDataset(os.path.join(root, 'split/utterance/val.csv'), data_root)
+    test_data = AudioDataset(os.path.join(root, 'split/utterance/test.csv'), data_root)
 
     n_cpu = os.cpu_count()
 
