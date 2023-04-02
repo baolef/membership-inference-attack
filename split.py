@@ -40,6 +40,6 @@ if __name__ == '__main__':
     val_df = pd.DataFrame(val, columns=['wav', 'start', 'stop', 'spk_id','label'])
     test_df=pd.DataFrame(test,columns=['wav','start','stop','spk_id','label'])
 
-    train_df.to_csv('split/train.csv',index=False)
-    val_df.to_csv('split/val.csv',index=False)
-    test_df.to_csv('split/test.csv',index=False)
+    train_df.to_csv('split/speaker/train.csv',index=False)
+    val_df.to_csv('split/speaker/val.csv',index=False)
+    test_df.to_csv('split/speaker/test.csv',index=False)
