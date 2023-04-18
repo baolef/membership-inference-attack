@@ -21,7 +21,7 @@ def unseen(root):
 
 
 if __name__ == '__main__':
-    orig_train = pd.read_csv('original/train.csv')
+    orig_train = pd.read_csv('original/all.csv')
     orig_train = orig_train[orig_train.spk_id.str.startswith('id1')]
     orig_train=orig_train.drop(columns=['ID','duration'])
     positive=orig_train.to_numpy()
