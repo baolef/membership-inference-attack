@@ -21,7 +21,7 @@ def unseen(root):
 
 
 if __name__ == '__main__':
-    orig_train = pd.read_csv('original/train.csv')
+    orig_train = pd.read_csv('original/dev.csv')
     orig_train = orig_train[orig_train.spk_id.str.startswith('id1')]
     orig_train=orig_train.drop(columns=['ID','duration'])
     positive=orig_train.to_numpy()
@@ -41,5 +41,5 @@ if __name__ == '__main__':
     test_df=pd.DataFrame(test,columns=['wav','start','stop','spk_id','label'])
 
     train_df.to_csv('split/speaker/train.csv',index=False)
-    val_df.to_csv('split/speaker/val.csv',index=False)
+    val_df.to_csv('split/speaker/test.csv',index=False)
     test_df.to_csv('split/speaker/test.csv',index=False)
