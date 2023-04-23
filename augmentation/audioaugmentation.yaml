@@ -1,26 +1,3 @@
-# sample_rate: 16000
-
-# add_noise: !new:speechbrain.lobes.augment.EnvCorrupt
-#     openrir_max_noise_len: 3.0  # seconds
-#     reverb_prob: 0.0
-#     noise_prob: 1.0
-#     noise_snr_low: 0
-#     noise_snr_high: 15
-#     rir_scale_factor: 1.0
-
-# augment_speed: !new:speechbrain.lobes.augment.TimeDomainSpecAugment
-#     sample_rate: !ref <sample_rate>
-#     speeds: [95, 100, 105]
-
-# augment_wavedrop: !new:speechbrain.lobes.augment.TimeDomainSpecAugment
-#     sample_rate: !ref <sample_rate>
-#     speeds: [100]
-  
-# augment_pipeline: [
-#     !ref <add_noise>,
-#     !ref <augment_speed>
-# ]
-
 sample_rate: 16000
 
 add_noise: !new:speechbrain.lobes.augment.EnvCorrupt
