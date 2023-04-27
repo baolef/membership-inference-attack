@@ -50,6 +50,7 @@ def compute_features(model, loader, hparams):
         with torch.inference_mode():
             embedding = model.encode_batch(aug).cpu().squeeze(1)
             distances=cosine_similarity(embedding,embedding)
+            distances=distances[~np.eye(distances.shape[0], dtype=bool)].reshape(distances.shape[0], -1) # delete diagonal
         features.append([distances.mean(),distances.std()])
         labels.append(label)
     return torch.tensor(features).numpy(), torch.tensor(labels).numpy()
